@@ -14,6 +14,7 @@ export interface Recipe {
   name: string;
   tags: string[];
   duration?: string;
+  servings: number;
   ingredients: RecipeIngredient[];
   detailsHtml: string;
   issueLink: string;
@@ -22,6 +23,7 @@ export interface Recipe {
 
 export interface RecipeMetadata {
   durée?: string;
+  personnes?: number;
   ingrédients?: string[];
 }
 
@@ -48,6 +50,7 @@ function issueToRecipe(issue: GithubIssue): Recipe {
     name: issue.title,
     tags: issue.labels.map(l => l.name),
     duration: metadata.durée,
+    servings: metadata.personnes || 1,
     ingredients: (metadata.ingrédients || [])
       .map(strToIngredient)
       .filter(x => x) as RecipeIngredient[],

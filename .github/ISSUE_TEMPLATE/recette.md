@@ -9,6 +9,7 @@ assignees: ''
 
 ---
 durée: 1h
+personnes: 2
 # format: quantité[unité] description
 ingrédients:
 - 100g de farine

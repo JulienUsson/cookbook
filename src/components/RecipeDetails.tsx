@@ -21,6 +21,7 @@ export default function RecipeDetails({ recipe }: Props) {
         <EditIcon />
       </IconButton>
       {recipe.duration && <Typography>Durée: {recipe.duration}</Typography>}
+      <Typography>Personnes: {recipe.servings}</Typography>
       <div>
         <Typography variant="h6">Ingrédients :</Typography>
         {recipe.ingredients.map((ingredient, index) => (
