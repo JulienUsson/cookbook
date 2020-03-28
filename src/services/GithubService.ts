@@ -25,7 +25,9 @@ export async function getOpenIssues(): Promise<GithubIssue[]> {
     `/repos/${githubUser}/${githubRepository}/issues`,
     {
       params: {
-        state: "open"
+        state: "open",
+        sort: "created",
+        direction: "asc"
       }
     }
   );
