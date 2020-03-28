@@ -1,24 +1,57 @@
 import useSWR from "swr";
 import showdown from "showdown";
 import { GithubIssue, getOpenIssues } from "./GithubService";
+import yaml from "js-yaml";
+
+export interface RecipeIngredient {
+  quantity: number;
+  unit?: string;
+  name: string;
+}
 
 export interface Recipe {
   id: number;
   name: string;
   tags: string[];
+  duration?: string;
+  ingredients: RecipeIngredient[];
   detailsHtml: string;
   issueLink: string;
   issue: GithubIssue;
 }
 
-const converter = new showdown.Converter({ metadata: true });
+export interface RecipeMetadata {
+  durée?: string;
+  ingrédients?: string[];
+}
+
+function strToIngredient(ingredient: string): RecipeIngredient | undefined {
+  const regex = /^([0-9.]*)(\w*) (.*)$/gi;
+  const args = regex.exec(ingredient);
+  if (!args) {
+    return undefined;
+  }
+  return {
+    quantity: Number.parseFloat(args[1]),
+    unit: args[2] || undefined,
+    name: args[3]
+  };
+}
 
 function issueToRecipe(issue: GithubIssue): Recipe {
+  const converter = new showdown.Converter({ metadata: true });
+  const detailsHtml = converter.makeHtml(issue.body);
+  const rawMetadata = converter.getMetadata(true) as string;
+  const metadata = yaml.safeLoad(rawMetadata) as RecipeMetadata;
   return {
     id: issue.id,
     name: issue.title,
     tags: issue.labels.map(l => l.name),
-    detailsHtml: converter.makeHtml(issue.body),
+    duration: metadata.durée,
+    ingredients: (metadata.ingrédients || [])
+      .map(strToIngredient)
+      .filter(x => x) as RecipeIngredient[],
+    detailsHtml,
     issueLink: issue.html_url,
     issue
   };

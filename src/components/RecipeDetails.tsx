@@ -20,7 +20,16 @@ export default function RecipeDetails({ recipe }: Props) {
       >
         <EditIcon />
       </IconButton>
-
+      {recipe.duration && <Typography>Durée: {recipe.duration}</Typography>}
+      <div>
+        <Typography variant="h6">Ingrédients :</Typography>
+        {recipe.ingredients.map((ingredient, index) => (
+          <Typography key={index}>
+            {ingredient.quantity}
+            {ingredient.unit} {ingredient.name}
+          </Typography>
+        ))}
+      </div>
       <div dangerouslySetInnerHTML={{ __html: recipe.detailsHtml }} />
     </Card>
   );

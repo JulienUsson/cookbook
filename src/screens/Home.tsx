@@ -13,7 +13,7 @@ export default function Home({ recipes }: Props) {
   return (
     <div>
       {recipes.map(recipe => (
-        <RecipeDetails recipe={recipe} />
+        <RecipeDetails key={recipe.id} recipe={recipe} />
       ))}
       <Fab
         component="a"
