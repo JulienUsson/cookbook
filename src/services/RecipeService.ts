@@ -12,6 +12,7 @@ export interface RecipeIngredient {
 export interface Recipe {
   id: number;
   name: string;
+  image?: string;
   tags: string[];
   duration?: string;
   servings: number;
@@ -22,6 +23,7 @@ export interface Recipe {
 }
 
 export interface RecipeMetadata {
+  image?: string;
   durée?: string;
   personnes?: number;
   ingrédients?: string[];
@@ -48,6 +50,7 @@ function issueToRecipe(issue: GithubIssue): Recipe {
   return {
     id: issue.id,
     name: issue.title,
+    image: metadata.image,
     tags: issue.labels.map(l => l.name),
     duration: metadata.durée,
     servings: metadata.personnes || 1,

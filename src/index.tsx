@@ -5,6 +5,7 @@ import * as serviceWorker from "./serviceWorker";
 import { ThemeProvider } from "@material-ui/core/styles";
 import theme from "./theme";
 import { CssBaseline } from "@material-ui/core";
+import "./app.css";
 
 ReactDOM.render(
   <React.StrictMode>

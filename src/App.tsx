@@ -1,9 +1,15 @@
 import React, { useMemo } from "react";
 import { useFindAllRecipes } from "./services/RecipeService";
 import { Typography } from "@material-ui/core";
-import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  Redirect
+} from "react-router-dom";
 import Home from "./screens/Home";
 import { getIndexFromRecipes } from "./services/LunrService";
+import RecipeDetails from "./screens/RecipeDetails";
 
 export default function App() {
   const { data: recipes, error } = useFindAllRecipes();
@@ -25,9 +31,13 @@ export default function App() {
   return (
     <Router>
       <Switch>
-        <Route path="/">
+        <Route exact path="/">
           <Home recipes={recipes} />
         </Route>
+        <Route exact path="/recettes/:id">
+          <RecipeDetails recipes={recipes} />
+        </Route>
+        <Redirect to="/" />
       </Switch>
     </Router>
   );
