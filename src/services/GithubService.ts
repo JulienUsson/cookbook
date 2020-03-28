@@ -31,3 +31,14 @@ export async function getOpenIssues(): Promise<GithubIssue[]> {
   );
   return data;
 }
+
+export async function getLabels(): Promise<GithubIssueLabel[]> {
+  const { data } = await githubApi.get<GithubIssueLabel[]>(
+    `/repos/${githubUser}/${githubRepository}/labels`
+  );
+  return data;
+}
+
+export function getIssuesLink() {
+  return `https://github.com/${githubUser}/${githubRepository}/issues`;
+}
