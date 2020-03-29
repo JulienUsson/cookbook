@@ -46,7 +46,6 @@ const HeroTitle = styled(props => (
 }));
 
 const RecipesContainer = styled(Paper)(({ theme }) => ({
-  minHeight: "20vh",
   margin: theme.spacing(0, 4),
   transform: "translateY(-10vh)",
   display: "grid",
@@ -69,6 +68,16 @@ const RecipesContainer = styled(Paper)(({ theme }) => ({
   [theme.breakpoints.up("lg")]: {
     gridTemplateColumns: "repeat(5, 1fr)"
   }
+}));
+
+const NoRecipesFound = styled(Paper)(({ theme }) => ({
+  minHeight: "20vh",
+  margin: theme.spacing(0, 4),
+  transform: "translateY(-10vh)",
+  padding: theme.spacing(2),
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center"
 }));
 
 const CustomCardMedia = styled(CardMedia)(({ theme }) => ({
@@ -146,30 +155,36 @@ export default function Home({ recipes: recipesProps, tags }: Props) {
           onTagsChange={setSelectedTags}
         />
       </Hero>
-      <RecipesContainer>
-        {recipes.map(recipe => (
-          <Link key={recipe.id} to={`/recettes/${recipe.id}`}>
-            <Card variant="outlined">
-              <CustomCardMedia image={recipe.image} />
-              <Box m={1}>
-                <Typography variant="h5">{recipe.name}</Typography>
-              </Box>
-              <TagsContainer>
-                {recipe.tags.map(tag => (
-                  <Tag
-                    key={tag.name}
-                    {...tag}
-                    selected={selectedTags.some(
-                      selectedTag => selectedTag.name === tag.name
-                    )}
-                    size="small"
-                  />
-                ))}
-              </TagsContainer>
-            </Card>
-          </Link>
-        ))}
-      </RecipesContainer>
+      {recipes.length > 0 ? (
+        <RecipesContainer>
+          {recipes.map(recipe => (
+            <Link key={recipe.id} to={`/recettes/${recipe.id}`}>
+              <Card variant="outlined">
+                <CustomCardMedia image={recipe.image} />
+                <Box m={1}>
+                  <Typography variant="h5">{recipe.name}</Typography>
+                </Box>
+                <TagsContainer>
+                  {recipe.tags.map(tag => (
+                    <Tag
+                      key={tag.name}
+                      {...tag}
+                      selected={selectedTags.some(
+                        selectedTag => selectedTag.name === tag.name
+                      )}
+                      size="small"
+                    />
+                  ))}
+                </TagsContainer>
+              </Card>
+            </Link>
+          ))}
+        </RecipesContainer>
+      ) : (
+        <NoRecipesFound>
+          <Typography>Aucune recette trouvée.</Typography>
+        </NoRecipesFound>
+      )}
       <Box mb={4}>
         <Typography variant="h6" align="center">
           Fait avec amour par{" "}
