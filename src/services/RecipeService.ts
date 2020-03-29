@@ -35,7 +35,7 @@ export interface RecipeMetadata {
 }
 
 function strToIngredient(ingredient: string): RecipeIngredient | undefined {
-  const regex = /^([0-9.]*)(\w*) (.*)$/gi;
+  const regex = /^([0-9.]*)([a-zA-Zèàé]*) (.*)$/gi;
   const args = regex.exec(ingredient);
   if (!args) {
     return undefined;
