@@ -12,6 +12,10 @@ const ServingsSelector = styled("div")(({ theme }) => ({
   width: 150
 }));
 
+const Unit = styled("span")({
+  fontWeight: 500
+});
+
 interface Props {
   ingredients: RecipeIngredient[];
   servings: number;
@@ -53,8 +57,12 @@ export default function Ingredients({
       <Typography variant="h6">Ingrédients :</Typography>
       {ingredients.map((ingredient, index) => (
         <Typography key={index}>
-          - {ingredient.quantity}
-          {ingredient.unit} {ingredient.name}
+          -{" "}
+          <Unit>
+            {ingredient.quantity}
+            {ingredient.unit}
+          </Unit>{" "}
+          {ingredient.name}
         </Typography>
       ))}
     </div>

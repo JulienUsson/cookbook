@@ -3,7 +3,8 @@ import { red } from "@material-ui/core/colors";
 
 export default createMuiTheme({
   typography: {
-    fontFamily: "'Baloo Thambi 2', cursive"
+    fontFamily: "'Baloo Thambi 2', cursive",
+    fontSize: 18
   },
   palette: {
     primary: red

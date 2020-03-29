@@ -33,7 +33,7 @@ const LeftPanel = styled("div")(({ theme }) => ({
     margin: theme.spacing(0, 2)
   },
   [theme.breakpoints.up("sm")]: {
-    minWidth: 200,
+    width: 300,
     marginRight: theme.spacing(2)
   }
 }));

@@ -19,7 +19,9 @@ import Search from "../components/Search";
 import { getIndexFromRecipes } from "../services/LunrService";
 
 const Root = styled("div")({
-  minHeight: "100vh"
+  minHeight: "100vh",
+  display: "flex",
+  flexDirection: "column"
 });
 
 const Hero = styled("div")({
@@ -185,6 +187,7 @@ export default function Home({ recipes: recipesProps, tags }: Props) {
           <Typography>Aucune recette trouvée.</Typography>
         </NoRecipesFound>
       )}
+      <Box flexGrow={1} />
       <Box mb={4}>
         <Typography variant="h6" align="center">
           Fait avec amour par{" "}
