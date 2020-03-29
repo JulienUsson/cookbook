@@ -6,9 +6,13 @@ import { ThemeProvider } from "@material-ui/core/styles";
 import theme from "./theme";
 import { CssBaseline } from "@material-ui/core";
 import "./app.css";
+import { Helmet } from "react-helmet";
 
 ReactDOM.render(
   <React.StrictMode>
+    <Helmet>
+      <title>{process.env.REACT_APP_TITLE}</title>
+    </Helmet>
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <App />
