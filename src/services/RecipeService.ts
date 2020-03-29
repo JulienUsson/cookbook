@@ -1,11 +1,6 @@
 import useSWR from "swr";
 import showdown from "showdown";
-import {
-  GithubIssue,
-  getOpenIssues,
-  getLabels,
-  GithubIssueLabel
-} from "./GithubService";
+import { GithubIssue, getOpenIssues, GithubIssueLabel } from "./GithubService";
 import yaml from "js-yaml";
 
 export interface RecipeIngredient {
@@ -28,8 +23,8 @@ export interface Recipe {
   servings: number;
   ingredients: RecipeIngredient[];
   detailsHtml: string;
+  detailsMarkdown: string;
   issueLink: string;
-  issue: GithubIssue;
 }
 
 export interface RecipeMetadata {
@@ -72,8 +67,8 @@ function issueToRecipe(issue: GithubIssue): Recipe {
       .map(strToIngredient)
       .filter(x => x) as RecipeIngredient[],
     detailsHtml,
-    issueLink: issue.html_url,
-    issue
+    detailsMarkdown: issue.body,
+    issueLink: issue.html_url
   };
 }
 
@@ -84,13 +79,4 @@ export async function getRecipes(): Promise<Recipe[]> {
 
 export function useFindAllRecipes() {
   return useSWR("recipes", getRecipes);
-}
-
-export async function getTags(): Promise<RecipeTag[]> {
-  const labels = await getLabels();
-  return labels.map(labelToTag);
-}
-
-export function useFindAllTags() {
-  return useSWR("tags", getTags);
 }

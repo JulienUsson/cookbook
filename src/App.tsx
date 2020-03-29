@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { useFindAllRecipes, useFindAllTags } from "./services/RecipeService";
+import { useFindAllRecipes, RecipeTag } from "./services/RecipeService";
 import { Typography } from "@material-ui/core";
 import {
   BrowserRouter as Router,
@@ -8,26 +8,29 @@ import {
   Redirect
 } from "react-router-dom";
 import Home from "./screens/Home";
-import { getIndexFromRecipes } from "./services/LunrService";
 import RecipeDetails from "./screens/RecipeDetails";
+import uniqBy from "lodash/uniqBy";
 
 export default function App() {
-  const { data: recipes, error: recipesError } = useFindAllRecipes();
-  const { data: tags, error: tagsError } = useFindAllTags();
+  const { data: recipes, error } = useFindAllRecipes();
 
-  const index = useMemo(() => {
+  const tags = useMemo(() => {
     if (!recipes) {
       return undefined;
     }
-    return getIndexFromRecipes(recipes);
+    const tags = recipes.reduce((acc, recipe) => {
+      recipe.tags.forEach(t => acc.push(t));
+      return acc;
+    }, [] as RecipeTag[]);
+    return uniqBy(tags, "name");
   }, [recipes]);
 
-  if (!recipes || !tags) {
-    return <Typography>loading</Typography>;
+  if (error) {
+    return <Typography color="error">Erreur: Réessayer plus tard.</Typography>;
   }
 
-  if (recipesError || tagsError) {
-    return <Typography>error</Typography>;
+  if (!recipes || !tags) {
+    return <Typography>Chargement...</Typography>;
   }
 
   return (

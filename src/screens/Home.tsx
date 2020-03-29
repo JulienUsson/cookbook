@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useMemo } from "react";
 import { Recipe, RecipeTag } from "../services/RecipeService";
 import {
   Fab,
@@ -16,6 +16,7 @@ import { Link } from "react-router-dom";
 import heroImage from "../assets/hero.jpg";
 import Tag from "../components/Tag";
 import Search from "../components/Search";
+import { getIndexFromRecipes } from "../services/LunrService";
 
 const Root = styled("div")({
   minHeight: "100vh"
@@ -38,12 +39,14 @@ const HeroTitle = styled(props => (
 ))(({ theme }) => ({
   color: theme.palette.common.white,
   textShadow: "1px 1px #000",
+  marginBottom: theme.spacing(2),
   [theme.breakpoints.only("xs")]: {
     fontSize: "2rem"
   }
 }));
 
 const RecipesContainer = styled(Paper)(({ theme }) => ({
+  minHeight: "20vh",
   margin: theme.spacing(0, 4),
   transform: "translateY(-10vh)",
   display: "grid",
@@ -104,16 +107,48 @@ interface Props {
   tags: RecipeTag[];
 }
 
-export default function Home({ recipes, tags }: Props) {
+export default function Home({ recipes: recipesProps, tags }: Props) {
+  const [searchString, setSearchString] = useState("");
+  const [selectedTags, setSelectedTags] = useState<RecipeTag[]>([]);
+
+  const recipes = useMemo(() => {
+    if (!searchString && selectedTags.length === 0) {
+      return recipesProps;
+    }
+    let filteredByTagRecipes: Recipe[] = recipesProps;
+
+    if (selectedTags.length > 0) {
+      filteredByTagRecipes = filteredByTagRecipes.filter(r =>
+        r.tags.some(t => selectedTags.some(st => st.name === t.name))
+      );
+    }
+    if (searchString) {
+      const index = getIndexFromRecipes(recipesProps);
+      const results = index.search(searchString);
+      return results.map(
+        res =>
+          filteredByTagRecipes.find(
+            recette => recette.id.toString() === res.ref
+          )!
+      );
+    } else {
+      return filteredByTagRecipes;
+    }
+  }, [recipesProps, searchString, selectedTags]);
+
   return (
     <Root>
       <Hero>
         <HeroTitle>{process.env.REACT_APP_TITLE}</HeroTitle>
-        <Search recipes={recipes} tags={tags} />
+        <Search
+          tags={tags}
+          onSearchChange={setSearchString}
+          onTagsChange={setSelectedTags}
+        />
       </Hero>
       <RecipesContainer>
         {recipes.map(recipe => (
-          <Link to={`/recettes/${recipe.id}`}>
+          <Link key={recipe.id} to={`/recettes/${recipe.id}`}>
             <Card variant="outlined">
               <CustomCardMedia image={recipe.image} />
               <Box m={1}>
@@ -121,7 +156,14 @@ export default function Home({ recipes, tags }: Props) {
               </Box>
               <TagsContainer>
                 {recipe.tags.map(tag => (
-                  <Tag {...tag} size="small" />
+                  <Tag
+                    key={tag.name}
+                    {...tag}
+                    selected={selectedTags.some(
+                      selectedTag => selectedTag.name === tag.name
+                    )}
+                    size="small"
+                  />
                 ))}
               </TagsContainer>
             </Card>

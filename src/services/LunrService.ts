@@ -9,14 +9,10 @@ export function getIndexFromRecipes(recipes: Recipe[]) {
     this.use(lunr.fr);
     this.ref("id");
     this.field("name");
-    this.field("body");
+    this.field("detailsMarkdown");
 
     recipes.forEach(recipe => {
-      this.add({
-        id: recipe.id,
-        name: recipe.name,
-        body: recipe.issue.body
-      });
+      this.add(recipe);
     });
   });
 }
