@@ -1,9 +1,8 @@
 import React from "react";
-import { Recipe } from "../services/RecipeService";
+import { Recipe, RecipeTag } from "../services/RecipeService";
 import {
   Fab,
   Card,
-  CardContent,
   Typography,
   CardMedia,
   styled,
@@ -15,6 +14,8 @@ import AddIcon from "@material-ui/icons/Add";
 import { getIssuesLink } from "../services/GithubService";
 import { Link } from "react-router-dom";
 import heroImage from "../assets/hero.jpg";
+import Tag from "../components/Tag";
+import Search from "../components/Search";
 
 const Root = styled("div")({
   minHeight: "100vh"
@@ -28,7 +29,8 @@ const Hero = styled("div")({
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
-  paddingBottom: "10vh"
+  paddingBottom: "10vh",
+  flexDirection: "column"
 });
 
 const HeroTitle = styled(props => (
@@ -82,6 +84,13 @@ const CustomCardMedia = styled(CardMedia)(({ theme }) => ({
   }
 }));
 
+const TagsContainer = styled("div")(({ theme }) => ({
+  margin: theme.spacing(1, 0),
+  "& > *": {
+    margin: theme.spacing(0, 1)
+  }
+}));
+
 const AddFab = styled(props => (
   <Fab component="a" color="primary" {...props} />
 ))(({ theme }) => ({
@@ -92,24 +101,29 @@ const AddFab = styled(props => (
 
 interface Props {
   recipes: Recipe[];
+  tags: RecipeTag[];
 }
 
-export default function Home({ recipes }: Props) {
+export default function Home({ recipes, tags }: Props) {
   return (
     <Root>
       <Hero>
         <HeroTitle>{process.env.REACT_APP_TITLE}</HeroTitle>
+        <Search recipes={recipes} tags={tags} />
       </Hero>
       <RecipesContainer>
         {recipes.map(recipe => (
           <Link to={`/recettes/${recipe.id}`}>
             <Card variant="outlined">
               <CustomCardMedia image={recipe.image} />
-              <CardContent>
-                <Typography variant="body2" component="p">
-                  {recipe.name}
-                </Typography>
-              </CardContent>
+              <Box m={1}>
+                <Typography variant="h5">{recipe.name}</Typography>
+              </Box>
+              <TagsContainer>
+                {recipe.tags.map(tag => (
+                  <Tag {...tag} size="small" />
+                ))}
+              </TagsContainer>
             </Card>
           </Link>
         ))}

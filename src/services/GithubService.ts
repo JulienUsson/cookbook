@@ -2,6 +2,7 @@ import axios from "axios";
 
 export interface GithubIssueLabel {
   name: string;
+  color: string;
 }
 
 export interface GithubIssue {

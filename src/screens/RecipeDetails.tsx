@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { Recipe } from "../services/RecipeService";
+import { Recipe, RecipeTag } from "../services/RecipeService";
 import { Card, Typography, IconButton } from "@material-ui/core";
 import Ingredients from "../components/Ingredients";
 import EditIcon from "@material-ui/icons/Edit";
@@ -7,6 +7,7 @@ import { Redirect, useParams } from "react-router-dom";
 
 interface Props {
   recipes: Recipe[];
+  tags: RecipeTag[];
 }
 
 export default function RecipeDetails({ recipes }: Props) {

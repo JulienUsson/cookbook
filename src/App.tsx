@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { useFindAllRecipes } from "./services/RecipeService";
+import { useFindAllRecipes, useFindAllTags } from "./services/RecipeService";
 import { Typography } from "@material-ui/core";
 import {
   BrowserRouter as Router,
@@ -12,7 +12,9 @@ import { getIndexFromRecipes } from "./services/LunrService";
 import RecipeDetails from "./screens/RecipeDetails";
 
 export default function App() {
-  const { data: recipes, error } = useFindAllRecipes();
+  const { data: recipes, error: recipesError } = useFindAllRecipes();
+  const { data: tags, error: tagsError } = useFindAllTags();
+
   const index = useMemo(() => {
     if (!recipes) {
       return undefined;
@@ -20,11 +22,11 @@ export default function App() {
     return getIndexFromRecipes(recipes);
   }, [recipes]);
 
-  if (!recipes) {
+  if (!recipes || !tags) {
     return <Typography>loading</Typography>;
   }
 
-  if (error) {
+  if (recipesError || tagsError) {
     return <Typography>error</Typography>;
   }
 
@@ -32,10 +34,10 @@ export default function App() {
     <Router>
       <Switch>
         <Route exact path="/">
-          <Home recipes={recipes} />
+          <Home recipes={recipes} tags={tags} />
         </Route>
         <Route exact path="/recettes/:id">
-          <RecipeDetails recipes={recipes} />
+          <RecipeDetails recipes={recipes} tags={tags} />
         </Route>
         <Redirect to="/" />
       </Switch>
