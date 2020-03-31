@@ -7,8 +7,7 @@ import {
   Box,
   useTheme,
   useMediaQuery,
-  Button,
-  Paper
+  Button
 } from "@material-ui/core";
 import Ingredients from "../components/Ingredients";
 import EditIcon from "@material-ui/icons/Edit";
@@ -20,7 +19,8 @@ import BackIcon from "@material-ui/icons/ArrowBackIos";
 const Root = styled("div")(({ theme }) => ({
   display: "flex",
   flexDirection: "column",
-  [theme.breakpoints.up("sm")]: {
+  backgroundColor: "#FFFBFB",
+  [theme.breakpoints.up("md")]: {
     height: "100vh",
     flexDirection: "row"
   }
@@ -33,18 +33,33 @@ const LeftPanel = styled("div")(({ theme }) => ({
   [theme.breakpoints.only("xs")]: {
     margin: theme.spacing(0, 2)
   },
-  [theme.breakpoints.up("sm")]: {
-    width: 300,
+  [theme.breakpoints.up("md")]: {
+    backgroundColor: "#5D3352 ",
+    color: theme.palette.common.white,
+    "& *": {
+      color: theme.palette.common.white
+    },
+    boxShadow: theme.shadows[4],
+    minWidth: 300,
+    maxWidth: 300,
     marginRight: theme.spacing(2)
   }
 }));
 
-const LeftPanelContent = styled(Paper)(({ theme }) => ({
-  [theme.breakpoints.up("sm")]: {
-    display: "flex",
-    flexDirection: "column",
-    flexGrow: 1,
-    justifyContent: "center"
+const LeftPanelContent = styled("div")(({ theme }) => ({
+  [theme.breakpoints.down("sm")]: {
+    backgroundColor: "#5D3352",
+    color: theme.palette.common.white,
+    "& *": {
+      color: theme.palette.common.white
+    },
+    boxShadow: theme.shadows[4],
+    borderRadius: theme.shape.borderRadius,
+    padding: theme.spacing(2)
+  },
+  [theme.breakpoints.up("md")]: {
+    marginTop: theme.spacing(6),
+    padding: theme.spacing(0, 4, 0, 2)
   }
 }));
 
@@ -74,7 +89,7 @@ interface Props {
 export default function RecipeDetails({ recipes }: Props) {
   const { id: recipeId } = useParams();
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.only("xs"));
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   const recipe = useMemo(
     () => recipes.find(r => r.id.toString() === recipeId),
@@ -113,7 +128,11 @@ export default function RecipeDetails({ recipes }: Props) {
 
       <Body>
         {!isMobile && <Title recipe={recipe} />}
-        <Typography dangerouslySetInnerHTML={{ __html: recipe.detailsHtml }} />
+        <Box pt={2}>
+          <Typography
+            dangerouslySetInnerHTML={{ __html: recipe.detailsHtml }}
+          />
+        </Box>
       </Body>
     </Root>
   );
@@ -123,7 +142,9 @@ function Title({ recipe }: { recipe: Recipe }) {
   return (
     <>
       <TitleContainer>
-        <Typography variant="h2">{recipe.name}</Typography>
+        <Typography variant="h2" align="left">
+          {recipe.name}
+        </Typography>
         <Box flexGrow={1} />
         <div>
           <IconButton
