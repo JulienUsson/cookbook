@@ -7,7 +7,8 @@ import {
   Box,
   useTheme,
   useMediaQuery,
-  Button
+  Button,
+  Paper
 } from "@material-ui/core";
 import Ingredients from "../components/Ingredients";
 import EditIcon from "@material-ui/icons/Edit";
@@ -38,7 +39,7 @@ const LeftPanel = styled("div")(({ theme }) => ({
   }
 }));
 
-const LeftPanelContent = styled("div")(({ theme }) => ({
+const LeftPanelContent = styled(Paper)(({ theme }) => ({
   [theme.breakpoints.up("sm")]: {
     display: "flex",
     flexDirection: "column",
