@@ -62,12 +62,15 @@ const RecipesContainer = styled(Paper)(({ theme }) => ({
     boxShadow: "none"
   },
   [theme.breakpoints.only("sm")]: {
-    gridTemplateColumns: "repeat(3, 1fr)"
+    gridTemplateColumns: "repeat(2, 1fr)"
   },
   [theme.breakpoints.only("md")]: {
+    gridTemplateColumns: "repeat(3, 1fr)"
+  },
+  [theme.breakpoints.only("lg")]: {
     gridTemplateColumns: "repeat(4, 1fr)"
   },
-  [theme.breakpoints.up("lg")]: {
+  [theme.breakpoints.only("xl")]: {
     gridTemplateColumns: "repeat(5, 1fr)"
   }
 }));
@@ -164,7 +167,7 @@ export default function Home({ recipes: recipesProps, tags }: Props) {
               <Card variant="outlined">
                 <CustomCardMedia image={recipe.image} />
                 <Box m={1}>
-                  <Typography variant="h5">{recipe.name}</Typography>
+                  <Typography variant="subtitle2">{recipe.name}</Typography>
                 </Box>
                 <TagsContainer>
                   {recipe.tags.map(tag => (

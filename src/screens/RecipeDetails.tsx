@@ -122,9 +122,7 @@ function Title({ recipe }: { recipe: Recipe }) {
   return (
     <>
       <TitleContainer>
-        <Typography variant="h2" noWrap>
-          {recipe.name}
-        </Typography>
+        <Typography variant="h2">{recipe.name}</Typography>
         <Box flexGrow={1} />
         <div>
           <IconButton

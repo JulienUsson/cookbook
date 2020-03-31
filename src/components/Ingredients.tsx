@@ -3,6 +3,7 @@ import { Typography, IconButton, styled } from "@material-ui/core";
 import { RecipeIngredient } from "../services/RecipeService";
 import PlusIcon from "@material-ui/icons/Add";
 import MinusIcon from "@material-ui/icons/Remove";
+import isNaN from "lodash/isNaN";
 
 const ServingsSelector = styled("div")(({ theme }) => ({
   display: "flex",
@@ -19,6 +20,14 @@ const Unit = styled("span")({
 interface Props {
   ingredients: RecipeIngredient[];
   servings: number;
+}
+
+function formatNumber(number: number): string {
+  const str = number.toString();
+  if (str.indexOf(".") !== -1) {
+    return number.toFixed(2);
+  }
+  return str;
 }
 
 export default function Ingredients({
@@ -58,10 +67,12 @@ export default function Ingredients({
       {ingredients.map((ingredient, index) => (
         <Typography key={index}>
           -{" "}
-          <Unit>
-            {ingredient.quantity}
-            {ingredient.unit}
-          </Unit>{" "}
+          {!isNaN(ingredient.quantity) && (
+            <Unit>
+              {formatNumber(ingredient.quantity)}
+              {ingredient.unit}{" "}
+            </Unit>
+          )}
           {ingredient.name}
         </Typography>
       ))}
