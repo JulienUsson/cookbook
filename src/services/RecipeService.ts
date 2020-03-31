@@ -74,7 +74,15 @@ function issueToRecipe(issue: GithubIssue): Recipe {
 
 export async function getRecipes(): Promise<Recipe[]> {
   const issues = await getOpenIssues();
-  return issues.map(issueToRecipe);
+  return issues
+    .map(issue => {
+      try {
+        return issueToRecipe(issue);
+      } catch (e) {
+        return undefined;
+      }
+    })
+    .filter(x => x) as Recipe[];
 }
 
 export function useFindAllRecipes() {
