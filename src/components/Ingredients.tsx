@@ -3,7 +3,6 @@ import { Typography, IconButton, styled } from "@material-ui/core";
 import { RecipeIngredient } from "../services/RecipeService";
 import PlusIcon from "@material-ui/icons/Add";
 import MinusIcon from "@material-ui/icons/Remove";
-import isNaN from "lodash/isNaN";
 
 const ServingsSelector = styled("div")(({ theme }) => ({
   display: "flex",
@@ -39,7 +38,7 @@ export default function Ingredients({
     () =>
       ingredientsProp.map(i => ({
         ...i,
-        quantity: (i.quantity * servings) / servingsProp
+        quantity: i.quantity && (i.quantity * servings) / servingsProp
       })),
     [ingredientsProp, servings, servingsProp]
   );
@@ -67,7 +66,7 @@ export default function Ingredients({
       {ingredients.map((ingredient, index) => (
         <Typography key={index}>
           -{" "}
-          {!isNaN(ingredient.quantity) && (
+          {ingredient.quantity && (
             <Unit>
               {formatNumber(ingredient.quantity)}
               {ingredient.unit}{" "}

@@ -4,7 +4,7 @@ import { GithubIssue, getOpenIssues, GithubIssueLabel } from "./GithubService";
 import yaml from "js-yaml";
 
 export interface RecipeIngredient {
-  quantity: number;
+  quantity?: number;
   unit?: string;
   name: string;
 }
@@ -35,16 +35,20 @@ export interface RecipeMetadata {
 }
 
 function strToIngredient(ingredient: string): RecipeIngredient | undefined {
-  const regex = /^([0-9.]*)([a-zA-Zèàé]*) (.*)$/gi;
-  const args = regex.exec(ingredient);
-  if (!args) {
-    return undefined;
+  const regex = /^([0-9.]+)([a-zA-Zèàé]*) (.*)$/gi;
+  if (regex.test(ingredient)) {
+    const args = regex.exec(ingredient);
+    if (!args) {
+      return undefined;
+    }
+    return {
+      quantity: Number.parseFloat(args[1]),
+      unit: args[2] || undefined,
+      name: args[3]
+    };
+  } else {
+    return { name: ingredient };
   }
-  return {
-    quantity: Number.parseFloat(args[1]),
-    unit: args[2] || undefined,
-    name: args[3]
-  };
 }
 
 function labelToTag(label: GithubIssueLabel): RecipeTag {
@@ -79,6 +83,7 @@ export async function getRecipes(): Promise<Recipe[]> {
       try {
         return issueToRecipe(issue);
       } catch (e) {
+        console.error(e);
         return undefined;
       }
     })
