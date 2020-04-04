@@ -58,6 +58,9 @@ export async function getComments(): Promise<GithubComment[]> {
         headers: {
           "If-None-Match": storedIssues?.etag,
         },
+        params: {
+          per_page: 100,
+        },
       }
     );
 
@@ -97,6 +100,7 @@ export async function getOpenIssues(): Promise<GithubIssue[]> {
           "If-None-Match": storedIssues?.etag.substring(2),
         },
         params: {
+          per_page: 100,
           state: "open",
           sort: "created",
           direction: "desc",
