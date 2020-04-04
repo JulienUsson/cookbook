@@ -1,5 +1,10 @@
 import axios from "axios";
 
+interface StoredItem<T> {
+  etag: string;
+  items: T;
+}
+
 export interface GithubComment {
   issueId: number;
   issue_url: string;
@@ -31,29 +36,88 @@ const githubApi = axios.create({
   validateStatus: (status) => status >= 200 && status < 400,
 });
 
+function getIssueIdFromIssueUrl(issueUrl: string): number {
+  const regex = /https:\/\/api.github.com\/repos\/.*\/.*\/issues\/([0-9]+)/;
+  const issueId = Number.parseInt(regex.exec(issueUrl)![1]);
+  return issueId;
+}
+
 export async function getComments(): Promise<GithubComment[]> {
-  const { data } = await githubApi.get<GithubComment[]>(
-    `/repos/${githubUser}/${githubRepository}/issues/comments`
-  );
-  return data.map((c) => {
-    const regex = /https:\/\/api.github.com\/repos\/.*\/.*\/issues\/([0-9]+)/;
-    const issueId = Number.parseInt(regex.exec(c.issue_url)![1]);
-    return { ...c, issueId };
-  });
+  const localStorageContent = localStorage.getItem("comments");
+  let storedIssues = undefined;
+  if (localStorageContent) {
+    storedIssues = JSON.parse(localStorageContent) as StoredItem<
+      GithubComment[]
+    >;
+  }
+
+  try {
+    const { status, data, headers } = await githubApi.get<GithubComment[]>(
+      `/repos/${githubUser}/${githubRepository}/issues/comments`,
+      {
+        headers: {
+          "If-None-Match": storedIssues?.etag,
+        },
+      }
+    );
+
+    if (status === 304) {
+      return storedIssues!.items;
+    }
+    const newStoredIssues: StoredItem<GithubComment[]> = {
+      etag: headers["etag"],
+      items: data.map((c) => ({
+        ...c,
+        issueId: getIssueIdFromIssueUrl(c.issue_url),
+      })),
+    };
+    localStorage.setItem("comments", JSON.stringify(newStoredIssues));
+    return newStoredIssues.items;
+  } catch (e) {
+    if (storedIssues) {
+      return storedIssues.items;
+    }
+    throw e;
+  }
 }
 
 export async function getOpenIssues(): Promise<GithubIssue[]> {
-  const { data } = await githubApi.get<GithubIssue[]>(
-    `/repos/${githubUser}/${githubRepository}/issues`,
-    {
-      params: {
-        state: "open",
-        sort: "created",
-        direction: "desc",
-      },
+  const localStorageContent = localStorage.getItem("issues");
+  let storedIssues = undefined;
+  if (localStorageContent) {
+    storedIssues = JSON.parse(localStorageContent) as StoredItem<GithubIssue[]>;
+  }
+
+  try {
+    const { status, data, headers } = await githubApi.get<GithubIssue[]>(
+      `/repos/${githubUser}/${githubRepository}/issues`,
+      {
+        headers: {
+          "If-None-Match": storedIssues?.etag,
+        },
+        params: {
+          state: "open",
+          sort: "created",
+          direction: "desc",
+        },
+      }
+    );
+
+    if (status === 304) {
+      return storedIssues!.items;
     }
-  );
-  return data;
+    const newStoredIssues: StoredItem<GithubIssue[]> = {
+      etag: headers["etag"],
+      items: data,
+    };
+    localStorage.setItem("issues", JSON.stringify(newStoredIssues));
+    return data;
+  } catch (e) {
+    if (storedIssues) {
+      return storedIssues.items;
+    }
+    throw e;
+  }
 }
 
 export function getIssuesLink() {
