@@ -65,7 +65,7 @@ export async function getComments(): Promise<GithubComment[]> {
       return storedIssues!.items;
     }
     const newStoredIssues: StoredItem<GithubComment[]> = {
-      etag: headers["etag"],
+      etag: headers.etag.substring(2),
       items: data.map((c) => ({
         ...c,
         issueId: getIssueIdFromIssueUrl(c.issue_url),
@@ -77,6 +77,7 @@ export async function getComments(): Promise<GithubComment[]> {
     if (storedIssues) {
       return storedIssues.items;
     }
+    console.error(e);
     throw e;
   }
 }
@@ -93,7 +94,7 @@ export async function getOpenIssues(): Promise<GithubIssue[]> {
       `/repos/${githubUser}/${githubRepository}/issues`,
       {
         headers: {
-          "If-None-Match": storedIssues?.etag,
+          "If-None-Match": storedIssues?.etag.substring(2),
         },
         params: {
           state: "open",
@@ -116,6 +117,7 @@ export async function getOpenIssues(): Promise<GithubIssue[]> {
     if (storedIssues) {
       return storedIssues.items;
     }
+    console.error(e);
     throw e;
   }
 }
