@@ -23,7 +23,6 @@
     "react-router-dom": "^5.1.2",
     "react-scripts": "3.4.1",
     "showdown": "^1.9.1",
-    "swr": "^0.1.18",
     "typescript": "^3.8.3"
   },
   "scripts": {

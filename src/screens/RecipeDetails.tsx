@@ -7,7 +7,7 @@ import {
   Box,
   useTheme,
   useMediaQuery,
-  Button
+  Button,
 } from "@material-ui/core";
 import Ingredients from "../components/Ingredients";
 import EditIcon from "@material-ui/icons/Edit";
@@ -22,8 +22,8 @@ const Root = styled("div")(({ theme }) => ({
   backgroundColor: "#FFFBFB",
   [theme.breakpoints.up("md")]: {
     height: "100vh",
-    flexDirection: "row"
-  }
+    flexDirection: "row",
+  },
 }));
 
 const LeftPanel = styled("div")(({ theme }) => ({
@@ -31,19 +31,19 @@ const LeftPanel = styled("div")(({ theme }) => ({
   display: "flex",
   flexDirection: "column",
   [theme.breakpoints.only("xs")]: {
-    margin: theme.spacing(0, 2)
+    margin: theme.spacing(0, 2),
   },
   [theme.breakpoints.up("md")]: {
     backgroundColor: "#5D3352 ",
     color: theme.palette.common.white,
     "& *": {
-      color: theme.palette.common.white
+      color: theme.palette.common.white,
     },
     boxShadow: theme.shadows[4],
     minWidth: 300,
     maxWidth: 300,
-    marginRight: theme.spacing(2)
-  }
+    marginRight: theme.spacing(2),
+  },
 }));
 
 const LeftPanelContent = styled("div")(({ theme }) => ({
@@ -51,34 +51,34 @@ const LeftPanelContent = styled("div")(({ theme }) => ({
     backgroundColor: "#5D3352",
     color: theme.palette.common.white,
     "& *": {
-      color: theme.palette.common.white
+      color: theme.palette.common.white,
     },
     boxShadow: theme.shadows[4],
     borderRadius: theme.shape.borderRadius,
-    padding: theme.spacing(2)
+    padding: theme.spacing(2),
   },
   [theme.breakpoints.up("md")]: {
     marginTop: theme.spacing(6),
-    padding: theme.spacing(0, 4, 0, 2)
-  }
+    padding: theme.spacing(0, 4, 0, 2),
+  },
 }));
 
 const Body = styled("div")(({ theme }) => ({
   flexGrow: 1,
   overflowY: "auto",
   textAlign: "justify",
-  padding: theme.spacing(2)
+  padding: theme.spacing(2),
 }));
 
 const TitleContainer = styled("div")(({ theme }) => ({
   display: "flex",
-  flexDirection: "row"
+  flexDirection: "row",
 }));
 
 const TagsContainer = styled("div")(({ theme }) => ({
   "& > *": {
-    marginRight: theme.spacing(1)
-  }
+    marginRight: theme.spacing(1),
+  },
 }));
 
 interface Props {
@@ -92,7 +92,7 @@ export default function RecipeDetails({ recipes }: Props) {
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   const recipe = useMemo(
-    () => recipes.find(r => r.id.toString() === recipeId),
+    () => recipes.find((r) => r.id.toString() === recipeId),
     [recipeId, recipes]
   );
 
@@ -133,6 +133,21 @@ export default function RecipeDetails({ recipes }: Props) {
             dangerouslySetInnerHTML={{ __html: recipe.detailsHtml }}
           />
         </Box>
+
+        {recipe.comments.length > 0 && (
+          <Box pt={4}>
+            {recipe.comments.map((comment) => (
+              <Box pt={2} key={comment.body}>
+                <Typography>
+                  <Typography component="span" variant="h6">
+                    {comment.user} :
+                  </Typography>{" "}
+                  {comment.body}
+                </Typography>
+              </Box>
+            ))}
+          </Box>
+        )}
       </Body>
     </Root>
   );
@@ -158,7 +173,7 @@ function Title({ recipe }: { recipe: Recipe }) {
         </div>
       </TitleContainer>
       <TagsContainer>
-        {recipe.tags.map(tag => (
+        {recipe.tags.map((tag) => (
           <Tag key={tag.name} {...tag} selected />
         ))}
       </TagsContainer>

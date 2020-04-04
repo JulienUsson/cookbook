@@ -1,7 +1,18 @@
-import useSWR from "swr";
 import showdown from "showdown";
-import { GithubIssue, getOpenIssues, GithubIssueLabel } from "./GithubService";
+import {
+  GithubIssue,
+  getOpenIssues,
+  GithubIssueLabel,
+  getComments,
+  GithubComment,
+} from "./GithubService";
 import yaml from "js-yaml";
+import { useState, useEffect } from "react";
+
+export interface RecipeComment {
+  body: string;
+  user: string;
+}
 
 export interface RecipeIngredient {
   quantity?: number;
@@ -25,6 +36,7 @@ export interface Recipe {
   detailsHtml: string;
   detailsMarkdown: string;
   issueLink: string;
+  comments: RecipeComment[];
 }
 
 export interface RecipeMetadata {
@@ -47,7 +59,7 @@ function strToIngredient(ingredient: string): RecipeIngredient | undefined {
     return {
       quantity: Number.parseFloat(args[1]),
       unit: args[2] || undefined,
-      name: args[3]
+      name: args[3],
     };
   } else {
     return { name: ingredient };
@@ -58,7 +70,7 @@ function labelToTag(label: GithubIssueLabel): RecipeTag {
   return { name: label.name, color: `#${label.color}` };
 }
 
-function issueToRecipe(issue: GithubIssue): Recipe {
+function issueToRecipe(issue: GithubIssue, comments: GithubComment[]): Recipe {
   const converter = new showdown.Converter({ metadata: true });
   const detailsHtml = converter.makeHtml(issue.body);
   const rawMetadata = converter.getMetadata(true) as string;
@@ -72,27 +84,46 @@ function issueToRecipe(issue: GithubIssue): Recipe {
     servings: metadata.personnes || 1,
     ingredients: (metadata.ingrédients || [])
       .map(strToIngredient)
-      .filter(x => x) as RecipeIngredient[],
+      .filter((x) => x) as RecipeIngredient[],
     detailsHtml,
     detailsMarkdown: issue.body,
-    issueLink: issue.html_url
+    issueLink: issue.html_url,
+    comments: comments
+      .filter((c) => c.issueId === issue.number)
+      .map((c) => ({ user: c.user.login, body: c.body })),
   };
 }
 
-export async function getRecipes(): Promise<Recipe[]> {
-  const issues = await getOpenIssues();
-  return issues
-    .map(issue => {
-      try {
-        return issueToRecipe(issue);
-      } catch (e) {
-        console.error(e);
-        return undefined;
-      }
-    })
-    .filter(x => x) as Recipe[];
-}
+export function useFindAllRecipes(): [Recipe[] | undefined, Error | undefined] {
+  const [recipes, setRecipes] = useState<Recipe[]>();
+  const [error, setError] = useState<Error>();
 
-export function useFindAllRecipes() {
-  return useSWR("recipes", getRecipes);
+  useEffect(() => {
+    async function getRecipes() {
+      try {
+        const [issues, comments] = await Promise.all([
+          getOpenIssues(),
+          getComments(),
+        ]);
+        setRecipes(
+          issues
+            .map((issue) => {
+              try {
+                return issueToRecipe(issue, comments);
+              } catch (e) {
+                console.error(e);
+                return undefined;
+              }
+            })
+            .filter((x) => x) as Recipe[]
+        );
+      } catch (e) {
+        setError(e);
+      }
+    }
+
+    getRecipes();
+  }, []);
+
+  return [recipes, error];
 }

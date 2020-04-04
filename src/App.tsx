@@ -5,21 +5,21 @@ import {
   BrowserRouter as Router,
   Switch,
   Route,
-  Redirect
+  Redirect,
 } from "react-router-dom";
 import Home from "./screens/Home";
 import RecipeDetails from "./screens/RecipeDetails";
 import uniqBy from "lodash/uniqBy";
 
 export default function App() {
-  const { data: recipes, error } = useFindAllRecipes();
+  const [recipes, error] = useFindAllRecipes();
 
   const tags = useMemo(() => {
     if (!recipes) {
       return undefined;
     }
     const tags = recipes.reduce((acc, recipe) => {
-      recipe.tags.forEach(t => acc.push(t));
+      recipe.tags.forEach((t) => acc.push(t));
       return acc;
     }, [] as RecipeTag[]);
     return uniqBy(tags, "name");
