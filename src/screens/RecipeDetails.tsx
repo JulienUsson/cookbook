@@ -27,13 +27,11 @@ const Root = styled("div")(({ theme }) => ({
 }));
 
 const LeftPanel = styled("div")(({ theme }) => ({
-  padding: theme.spacing(1),
   display: "flex",
   flexDirection: "column",
-  [theme.breakpoints.only("xs")]: {
-    margin: theme.spacing(0, 2),
-  },
   [theme.breakpoints.up("md")]: {
+    padding: theme.spacing(1),
+    overflowY: "auto",
     backgroundColor: "#5D3352 ",
     color: theme.palette.common.white,
     "& *": {
@@ -54,11 +52,10 @@ const LeftPanelContent = styled("div")(({ theme }) => ({
       color: theme.palette.common.white,
     },
     boxShadow: theme.shadows[4],
-    borderRadius: theme.shape.borderRadius,
     padding: theme.spacing(2),
   },
   [theme.breakpoints.up("md")]: {
-    marginTop: theme.spacing(6),
+    marginTop: theme.spacing(4),
     padding: theme.spacing(0, 4, 0, 2),
   },
 }));
@@ -74,6 +71,15 @@ const TitleContainer = styled("div")(({ theme }) => ({
   display: "flex",
   flexDirection: "row",
 }));
+
+const Image = styled("div")({
+  height: 300,
+  width: "100%",
+  backgroundImage: ({ src }: { src: string }) => `url(${src})`,
+  backgroundPosition: "center",
+  backgroundSize: "contain",
+  backgroundRepeat: "no-repeat",
+});
 
 const TagsContainer = styled("div")(({ theme }) => ({
   "& > *": {
@@ -128,11 +134,12 @@ export default function RecipeDetails({ recipes }: Props) {
 
       <Body>
         {!isMobile && <Title recipe={recipe} />}
-        <Box pt={2}>
-          <Typography
-            dangerouslySetInnerHTML={{ __html: recipe.detailsHtml }}
-          />
+
+        <Box display="flex" justifyContent="center" p={2}>
+          {recipe.image && <Image src={recipe.image} />}
         </Box>
+
+        <Typography dangerouslySetInnerHTML={{ __html: recipe.detailsHtml }} />
 
         {recipe.comments.length > 0 && (
           <Box pt={4}>
