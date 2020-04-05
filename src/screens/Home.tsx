@@ -144,8 +144,10 @@ export default function Home({ recipes: recipesProps, tags }: Props) {
     }
 
     if (selectedTags.length > 0) {
-      return filteredBySearchString.filter((r) =>
-        r.tags.some((t) => selectedTags.some((st) => st.name === t.name))
+      return filteredBySearchString.filter(
+        (r) =>
+          r.tags.filter((t) => selectedTags.some((st) => st.name === t.name))
+            .length === selectedTags.length
       );
     } else {
       return filteredBySearchString;
