@@ -8,7 +8,7 @@ import {
   styled,
   Paper,
   Link as MuiLink,
-  Box
+  Box,
 } from "@material-ui/core";
 import AddIcon from "@material-ui/icons/Add";
 import { getIssuesLink } from "../services/GithubService";
@@ -16,12 +16,12 @@ import { Link } from "react-router-dom";
 import heroImage from "../assets/hero.jpg";
 import Tag from "../components/Tag";
 import Search from "../components/Search";
-import { getIndexFromRecipes } from "../services/LunrService";
+import Fuse from "fuse.js";
 
 const Root = styled("div")({
   minHeight: "100vh",
   display: "flex",
-  flexDirection: "column"
+  flexDirection: "column",
 });
 
 const Hero = styled("div")({
@@ -33,18 +33,18 @@ const Hero = styled("div")({
   alignItems: "center",
   justifyContent: "center",
   paddingBottom: "10vh",
-  flexDirection: "column"
+  flexDirection: "column",
 });
 
-const HeroTitle = styled(props => (
+const HeroTitle = styled((props) => (
   <Typography align="center" variant="h2" {...props} />
 ))(({ theme }) => ({
   color: theme.palette.common.white,
   textShadow: "1px 1px #000",
   marginBottom: theme.spacing(2),
   [theme.breakpoints.only("xs")]: {
-    fontSize: "2rem"
-  }
+    fontSize: "2rem",
+  },
 }));
 
 const RecipesContainer = styled(Paper)(({ theme }) => ({
@@ -59,20 +59,20 @@ const RecipesContainer = styled(Paper)(({ theme }) => ({
     gridTemplateColumns: "repeat(1, 1fr)",
     margin: theme.spacing(0),
     padding: theme.spacing(1),
-    boxShadow: "none"
+    boxShadow: "none",
   },
   [theme.breakpoints.only("sm")]: {
-    gridTemplateColumns: "repeat(2, 1fr)"
+    gridTemplateColumns: "repeat(2, 1fr)",
   },
   [theme.breakpoints.only("md")]: {
-    gridTemplateColumns: "repeat(3, 1fr)"
+    gridTemplateColumns: "repeat(3, 1fr)",
   },
   [theme.breakpoints.only("lg")]: {
-    gridTemplateColumns: "repeat(4, 1fr)"
+    gridTemplateColumns: "repeat(4, 1fr)",
   },
   [theme.breakpoints.only("xl")]: {
-    gridTemplateColumns: "repeat(5, 1fr)"
-  }
+    gridTemplateColumns: "repeat(5, 1fr)",
+  },
 }));
 
 const NoRecipesFound = styled(Paper)(({ theme }) => ({
@@ -82,39 +82,46 @@ const NoRecipesFound = styled(Paper)(({ theme }) => ({
   padding: theme.spacing(2),
   display: "flex",
   justifyContent: "center",
-  alignItems: "center"
+  alignItems: "center",
 }));
 
 const CustomCardMedia = styled(CardMedia)(({ theme }) => ({
   backgroundColor: theme.palette.grey[300],
   [theme.breakpoints.only("xs")]: {
-    height: 200
+    height: 200,
   },
   [theme.breakpoints.only("sm")]: {
-    height: 200
+    height: 200,
   },
   [theme.breakpoints.only("md")]: {
-    height: 200
+    height: 200,
   },
   [theme.breakpoints.up("lg")]: {
-    height: 300
-  }
+    height: 300,
+  },
 }));
 
 const TagsContainer = styled("div")(({ theme }) => ({
   margin: theme.spacing(1, 0),
   "& > *": {
-    margin: theme.spacing(0, 1)
-  }
+    margin: theme.spacing(0, 1),
+  },
 }));
 
-const AddFab = styled(props => (
+const AddFab = styled((props) => (
   <Fab component="a" color="primary" {...props} />
 ))(({ theme }) => ({
   position: "fixed",
   bottom: theme.spacing(2),
-  right: theme.spacing(2)
+  right: theme.spacing(2),
 }));
+
+const fuseOptions = {
+  limit: 10,
+  keys: ["name", "detailsMarkdown"],
+  isCaseSensitive: false,
+  includeMatches: true,
+};
 
 interface Props {
   recipes: Recipe[];
@@ -129,24 +136,19 @@ export default function Home({ recipes: recipesProps, tags }: Props) {
     if (!searchString && selectedTags.length === 0) {
       return recipesProps;
     }
-    let filteredByTagRecipes: Recipe[] = recipesProps;
+    let filteredBySearchString: Recipe[] = recipesProps;
+    if (searchString) {
+      const fuse = new Fuse(recipesProps, fuseOptions);
+      const results = fuse.search(searchString);
+      filteredBySearchString = results.map(({ item }) => item);
+    }
 
     if (selectedTags.length > 0) {
-      filteredByTagRecipes = filteredByTagRecipes.filter(r =>
-        r.tags.some(t => selectedTags.some(st => st.name === t.name))
-      );
-    }
-    if (searchString) {
-      const index = getIndexFromRecipes(recipesProps);
-      const results = index.search(searchString);
-      return results.map(
-        res =>
-          filteredByTagRecipes.find(
-            recette => recette.id.toString() === res.ref
-          )!
+      return filteredBySearchString.filter((r) =>
+        r.tags.some((t) => selectedTags.some((st) => st.name === t.name))
       );
     } else {
-      return filteredByTagRecipes;
+      return filteredBySearchString;
     }
   }, [recipesProps, searchString, selectedTags]);
 
@@ -162,7 +164,7 @@ export default function Home({ recipes: recipesProps, tags }: Props) {
       </Hero>
       {recipes.length > 0 ? (
         <RecipesContainer>
-          {recipes.map(recipe => (
+          {recipes.map((recipe) => (
             <Link key={recipe.id} to={`/recettes/${recipe.id}`}>
               <Card variant="outlined">
                 <CustomCardMedia image={recipe.image} />
@@ -170,12 +172,12 @@ export default function Home({ recipes: recipesProps, tags }: Props) {
                   <Typography variant="subtitle2">{recipe.name}</Typography>
                 </Box>
                 <TagsContainer>
-                  {recipe.tags.map(tag => (
+                  {recipe.tags.map((tag) => (
                     <Tag
                       key={tag.name}
                       {...tag}
                       selected={selectedTags.some(
-                        selectedTag => selectedTag.name === tag.name
+                        (selectedTag) => selectedTag.name === tag.name
                       )}
                       size="small"
                     />
