@@ -8,6 +8,7 @@ import {
   useTheme,
   useMediaQuery,
   Button,
+  Theme,
 } from "@material-ui/core";
 import Ingredients from "../components/Ingredients";
 import EditIcon from "@material-ui/icons/Edit";
@@ -72,14 +73,20 @@ const TitleContainer = styled("div")(({ theme }) => ({
   flexDirection: "row",
 }));
 
-const Image = styled("div")({
-  height: 300,
-  width: "100%",
-  backgroundImage: ({ src }: { src: string }) => `url(${src})`,
-  backgroundPosition: "center",
-  backgroundSize: "contain",
-  backgroundRepeat: "no-repeat",
-});
+type ImageProps = { src: string };
+const Image = styled(({ src, ...props }: ImageProps) => <div {...props} />)(
+  ({ theme, src }: ImageProps & { theme: Theme }) => ({
+    [theme.breakpoints.up("md")]: {
+      height: 150,
+    },
+    height: 300,
+    width: "100%",
+    backgroundImage: `url(${src})`,
+    backgroundPosition: "center",
+    backgroundSize: "contain",
+    backgroundRepeat: "no-repeat",
+  })
+);
 
 const TagsContainer = styled("div")(({ theme }) => ({
   "& > *": {
@@ -117,6 +124,11 @@ export default function RecipeDetails({ recipes }: Props) {
       <LeftPanel>
         {!isMobile && <BackToHome />}
         <LeftPanelContent>
+          {!isMobile && (
+            <Box display="flex" justifyContent="center" py={1}>
+              {recipe.image && <Image src={recipe.image} />}
+            </Box>
+          )}
           {recipe.duration && (
             <Typography variant="subtitle1">
               <Typography variant="h6" component="span">
@@ -135,9 +147,13 @@ export default function RecipeDetails({ recipes }: Props) {
       <Body>
         {!isMobile && <Title recipe={recipe} />}
 
-        <Box display="flex" justifyContent="center" p={2}>
-          {recipe.image && <Image src={recipe.image} />}
-        </Box>
+        {isMobile ? (
+          <Box display="flex" justifyContent="center" py={1}>
+            {recipe.image && <Image src={recipe.image} />}
+          </Box>
+        ) : (
+          <Box pt={4} />
+        )}
 
         <Typography dangerouslySetInnerHTML={{ __html: recipe.detailsHtml }} />
 
